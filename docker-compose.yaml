@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  keycloak:
+    image: jboss/keycloak:16.1.1
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - DB_VENDOR=h2
+    ports:
+      - 8080:8080
+
+  app-auth:
+    entrypoint: .docker/exc-ms-auth/entrypoint.sh
+    build:
+      context: .docker/exc-ms-auth/
+      dockerfile: Dockerfile.dev
+    container_name: exc-ms-auth-container
+    ports:
+      - 3333:3333
+    volumes:
+      - .:/home/node/app
+    networks:
+      - user-network
+      - proxynet
+
+networks:
+  user-network:
+    driver: bridge
+  proxynet:
+    name: custom_network
